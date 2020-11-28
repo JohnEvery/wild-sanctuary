@@ -8,6 +8,7 @@ import com.every.wildlife.animal.service.AnimalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class AnimalController {
     }
 
     @GetMapping("/animal/{id}")
-    public AnimalResponseDTO getAnimalById(@RequestParam(value = "id") Long animalId) {
+    public AnimalResponseDTO getAnimalById(@PathVariable(value = "id") Long animalId) {
         return new AnimalResponseDTO(animalService.getAnimalById(animalId));
     }
 
@@ -47,13 +48,16 @@ public class AnimalController {
     }
 
     @PutMapping("/animal/{id}")
-    public Long updateAnimal(@RequestParam(value = "id") Long animalId, String animalName,
-                             String animalType, String animalGroup, Long territoryId) {
-        return animalService.updateAnimal(animalId, animalName, animalType, animalGroup, territoryId).getId();
+    public Long updateAnimal(@RequestParam(value = "id") Long animalId, AnimalRequestDTO animalRequestDTO) {
+        return animalService.updateAnimal(animalId, animalRequestDTO.getAnimalName(),
+                animalService.getAnimalType(animalRequestDTO.getAnimalType()).getAnimalType(),
+                animalService.getAnimalGroup(animalRequestDTO.getAnimalGroup()).getAnimalGroup(),
+                animalRequestDTO.getTerritoryId()).getId();
     }
 
     @DeleteMapping("/animals/{id}")
-    public AnimalResponseDTO deleteAnimal(@RequestParam(value = "id") Long animalId) {
+    public AnimalResponseDTO deleteAnimal(@PathVariable Long animalId) {
         return new AnimalResponseDTO(animalService.deleteAnimal(animalId));
     }
+
 }

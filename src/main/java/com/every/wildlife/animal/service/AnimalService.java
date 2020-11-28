@@ -104,18 +104,11 @@ public class AnimalService {
             String animalGroupName = animal.getAnimalGroup();
             Integer groupNumber = getGroupNumber(animalGroupName);
             AnimalGroup animalGroup = getAnimalGroupService(groupNumber);
-            Long animalsScoreInGroup = animalsScoreInGroup(animalGroup);
+            Long animalsScoreInGroup = (long)getAllByGroup(groupNumber).size();
             GroupDTO groupDTO = new GroupDTO(animalGroupName, animalsScoreInGroup);
             groupDTOList.add(groupDTO);
         }
         return groupDTOList;
-    }
-
-    private Long animalsScoreInGroup(AnimalGroup animalGroup) {
-        long count;
-        List<Animal> all = animalRepository.findAll();
-        count = all.stream().filter(animal -> animal.getAnimalGroup().equals(animalGroup.toString())).count();
-        return count;
     }
 
     private Integer getGroupNumber(String animalGroup) {
@@ -131,6 +124,13 @@ public class AnimalService {
     private AnimalGroup getAnimalGroupService(Integer numberOfGroup) {
         AnimalGroup[] animalGroups = AnimalGroup.values();
         return animalGroups[numberOfGroup];
+    }
+
+    private List<Animal> getAllByGroup (Integer groupNumber) {
+        AnimalGroup animalGroup = getAnimalGroup(groupNumber);
+        String animalGroupString = animalGroup.getAnimalGroup();
+        return animalRepository.findAllByTerritoryGroup(animalGroupString).orElseThrow(()
+                -> new AnimalNotFoundException("Not found."));
     }
 
 }
